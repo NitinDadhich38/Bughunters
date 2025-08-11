@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="jumbotron">
+        <h1 class="display-4">Welcome, {{ current_user.username }}!</h1>
+        <p class="lead">This is your CFO AI Assistant dashboard. Upload a financial document to get started.</p>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    Upload Financial Document (CSV)
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <input type="file" name="file" class="form-control-file" id="fileUpload">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload and Analyze</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if analysis %}
+    <hr>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h2>Analysis Results</h2>
+
+            {% if chart_data %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Financial Summary Chart</h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="financialChart"></canvas>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if analysis.llm and not analysis.llm.error %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4>AI-Powered Strategic Insights</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">{{ analysis.llm.summary }}</p>
+                </div>
+            </div>
+
+            <h4>Strategic Suggestions</h4>
+            <div class="accordion" id="suggestionsAccordion">
+                {% for suggestion in analysis.llm.suggestions %}
+                <div class="card">
+                    <div class="card-header" id="heading{{ loop.index }}">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                                {{ loop.index }}. {{ suggestion.title }}
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapse{{ loop.index }}" class="collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading{{ loop.index }}" data-parent="#suggestionsAccordion">
+                        <div class="card-body">
+                            <strong>Suggestion:</strong> {{ suggestion.suggestion }}
+                            <hr>
+                            <strong>Potential Impact:</strong> {{ suggestion.impact }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% elif analysis.llm.error %}
+            <div class="alert alert-danger">
+                <strong>Error:</strong> {{ analysis.llm.error }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Raw Data Overview</h4>
+                </div>
+                <div class="card-body">
+                    <h5>Summary Statistics</h5>
+                    {{ analysis.summary | safe }}
+
+                    <h5 class="mt-4">First 5 Rows of Data</h5>
+                    {{ analysis.head | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    {% if chart_data %}
+    const ctx = document.getElementById('financialChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_data.labels | tojson }},
+            datasets: [{
+                label: 'Amount by Category',
+                data: {{ chart_data.data | tojson }},
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}
