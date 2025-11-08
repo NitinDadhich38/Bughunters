@@ -1,0 +1,15 @@
+# Core libraries for the agent
+langchain
+python-dotenv
+
+# For Instagram API integration (using a library that supports the official Graph API)
+# Note: To be replaced with the actual library once selected, e.g., 'facebook-business'
+# For now, we'll use 'requests' for placeholder API calls.
+requests
+
+# For NLP and profile analysis
+# NLTK or spaCy can be added here if needed for more advanced text processing.
+# For now, we rely on the LLM's capabilities.
+
+# For data handling
+pandas
