@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlueCred Biosphere - Upload Sustainable Project</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0a1f1b;
+            --glass-bg: rgba(10, 31, 27, 0.8);
+            --border-color: rgba(0, 200, 150, 0.2);
+            --primary-accent: #00C896;
+            --text-primary: #E0E0E0;
+            --text-secondary: #A8B2AF;
+            --step-inactive: #A8B2AF;
+            --step-active-bg: #003d2e;
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --font-heading: 'Poppins', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --border-radius-lg: 24px;
+            --border-radius-md: 16px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            background-image:
+                radial-gradient(at 27% 37%, hsla(160, 100%, 74%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 97% 21%, hsla(160, 100%, 74%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 82% 99%, hsla(160, 100%, 74%, 0.1) 0px, transparent 50%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            font-weight: 600;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: rgba(10, 31, 27, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--primary-accent);
+            color: var(--primary-accent);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary-accent);
+            color: var(--primary-bg);
+        }
+
+        .main-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8rem 2rem 2rem;
+        }
+
+        .glass-card {
+            width: 100%;
+            max-width: 1200px;
+            min-height: 700px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            display: flex;
+            overflow: hidden;
+        }
+
+        .stepper {
+            width: 300px;
+            padding: 2rem;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .stepper ul {
+            list-style: none;
+        }
+
+        .stepper .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .stepper .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 48px;
+            height: calc(100% - 20px);
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .stepper .step.active, .stepper .step.completed {
+            opacity: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            border: 2px solid var(--step-inactive);
+            color: var(--step-inactive);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            margin-right: 1rem;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .stepper .step.active .step-number {
+            background: var(--primary-accent);
+            border-color: var(--primary-accent);
+            color: var(--primary-bg);
+        }
+
+        .stepper .step.completed .step-number {
+            background: var(--step-active-bg);
+            border-color: var(--primary-accent);
+            color: var(--primary-accent);
+        }
+
+        .step-label strong {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .step-label span {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .form-viewport {
+            flex-grow: 1;
+            padding: 2rem 3rem;
+            overflow-y: auto;
+        }
+
+        .form-step {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .form-step.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .form-step h2 {
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.3);
+        }
+
+        .radio-group, .checkbox-group {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .radio-group label, .checkbox-group label {
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        input[type="radio"], input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            gap: 1rem;
+        }
+
+        .prev-btn, .next-btn, .submit-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .prev-btn {
+            background: var(--input-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .next-btn, .submit-btn {
+            background: var(--primary-accent);
+            color: var(--primary-bg);
+        }
+
+        .prev-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .next-btn:hover, .submit-btn:hover {
+            box-shadow: 0 0 15px rgba(0, 200, 150, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .upload-area:hover {
+            background-color: var(--input-bg);
+            border-color: var(--primary-accent);
+        }
+
+        #file-preview {
+            margin-top: 1.5rem;
+        }
+
+        .tooltip {
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            color: var(--primary-accent);
+        }
+
+        .tooltip:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--step-active-bg);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius-md);
+            white-space: nowrap;
+            z-index: 10;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="top-nav">
+        <div class="logo">
+            <span>BlueCred Biosphere</span>
+        </div>
+        <div class="user-info">
+            <span>NGO Name (ID: 12345)</span>
+            <button class="logout-btn">Logout</button>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="glass-card">
+            <aside class="stepper">
+                <ul>
+                    <li class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">
+                            <strong>Basic Information</strong>
+                            <span>Project core details</span>
+                        </div>
+                    </li>
+                    <li class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">
+                            <strong>Technical Details</strong>
+                            <span>Technology-specific data</span>
+                        </div>
+                    </li>
+                    <li class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">
+                            <strong>Carbon Impact</strong>
+                            <span>Estimated CO₂ reduction</span>
+                        </div>
+                    </li>
+                    <li class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">
+                            <strong>Evidence Upload</strong>
+                            <span>Supporting documents</span>
+                        </div>
+                    </li>
+                    <li class="step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-label">
+                            <strong>Review & Submit</strong>
+                            <span>Final verification</span>
+                        </div>
+                    </li>
+                </ul>
+            </aside>
+            <section class="form-viewport">
+                <form id="project-upload-form">
+                    <!-- Step 1: Basic Project Information -->
+                    <div class="form-step active" data-step="1">
+                        <h2>Step 1: Basic Project Information</h2>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="project-name">Project Name</label>
+                                <input type="text" id="project-name" name="projectName" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Project Type</label>
+                                <div class="radio-group">
+                                    <input type="radio" id="tree-plantation" name="projectType" value="tree" checked>
+                                    <label for="tree-plantation">Tree Plantation</label>
+                                    <input type="radio" id="solar-energy" name="projectType" value="solar">
+                                    <label for="solar-energy">Solar Energy</label>
+                                </div>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="project-description">Project Description</label>
+                                <textarea id="project-description" name="projectDescription" rows="4" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Country</label>
+                                <input type="text" id="country" name="country" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State / Province</label>
+                                <input type="text" id="state" name="state" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gps-lat">GPS Latitude</label>
+                                <input type="text" id="gps-lat" name="gpsLat" required>
+                            </div>
+                             <div class="form-group">
+                                <label for="gps-long">GPS Longitude</label>
+                                <input type="text" id="gps-long" name="gpsLong" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="start-date">Project Start Date</label>
+                                <input type="date" id="start-date" name="startDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="end-date">Project End Date</label>
+                                <input type="date" id="end-date" name="endDate">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="ongoing" name="ongoing">
+                                    <label for="ongoing">This project is ongoing</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="navigation-buttons">
+                            <button type="button" class="next-btn" data-next="2">Next Step</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Technical Project Details -->
+                    <div class="form-step" data-step="2">
+                        <h2>Step 2: Technical Project Details</h2>
+                        <div id="technical-details-content">
+                            <!-- Dynamic content will be injected here by JS -->
+                        </div>
+                        <div class="navigation-buttons">
+                            <button type="button" class="prev-btn" data-prev="1">Back</button>
+                            <button type="button" class="next-btn" data-next="3">Next Step</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Carbon Impact Estimation -->
+                    <div class="form-step" data-step="3">
+                        <h2>Step 3: Carbon Impact Estimation</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="tco2e">Estimated Carbon Reduction (tCO₂e) <span class="tooltip" title="This is an estimate based on the provided data and is subject to third-party verification.">ⓘ</span></label>
+                                <input type="text" id="tco2e" name="tco2e" readonly value="1,250 tCO₂e">
+                            </div>
+                            <div class="form-group">
+                                <label for="methodology">Methodology Reference</label>
+                                <select id="methodology" name="methodology">
+                                    <option>CDM: AR-ACM0003</option>
+                                    <option>VCS: VM0007</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="assumptions">Assumptions Summary</label>
+                                <textarea id="assumptions" name="assumptions" rows="4"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="vintage-year">Vintage Year</label>
+                                <input type="number" id="vintage-year" name="vintageYear" value="2024">
+                            </div>
+                        </div>
+                        <div class="navigation-buttons">
+                            <button type="button" class="prev-btn" data-prev="2">Back</button>
+                            <button type="button" class="next-btn" data-next="4">Next Step</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Document & Evidence Upload -->
+                    <div class="form-step" data-step="4">
+                        <h2>Step 4: Document & Evidence Upload</h2>
+                        <div class="upload-area">
+                            <p>Drag & drop files or click to select</p>
+                            <input type="file" id="file-upload" multiple hidden>
+                        </div>
+                        <div id="file-preview"></div>
+                        <div class="navigation-buttons">
+                            <button type="button" class="prev-btn" data-prev="3">Back</button>
+                            <button type="button" class="next-btn" data-next="5">Next Step</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Review & Submit -->
+                    <div class="form-step" data-step="5">
+                        <h2>Step 5: Review & Submit</h2>
+                        <div id="review-summary"></div>
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="declaration" name="declaration" required>
+                                <label for="declaration">I declare that all information is true and accurate to the best of my knowledge.</label>
+                            </div>
+                        </div>
+                        <div class="navigation-buttons">
+                            <button type="button" class="prev-btn" data-prev="4">Back</button>
+                            <button type="submit" class="submit-btn">Submit Project</button>
+                        </div>
+                    </div>
+                </form>
+                <div id="confirmation-screen" style="display: none;">
+                    <h2>Project submitted successfully.</h2>
+                    <p>Status: Under Review</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('project-upload-form');
+        const nextButtons = document.querySelectorAll('.next-btn');
+        const prevButtons = document.querySelectorAll('.prev-btn');
+        const formSteps = document.querySelectorAll('.form-step');
+        const stepperSteps = document.querySelectorAll('.stepper .step');
+        const projectTypeRadios = document.querySelectorAll('input[name="projectType"]');
+        const technicalDetailsContainer = document.getElementById('technical-details-content');
+        const fileUploadInput = document.getElementById('file-upload');
+        const filePreviewContainer = document.getElementById('file-preview');
+        const uploadArea = document.querySelector('.upload-area');
+        const reviewSummaryContainer = document.getElementById('review-summary');
+        const confirmationScreen = document.getElementById('confirmation-screen');
+        const ongoingCheckbox = document.getElementById('ongoing');
+        const endDateInput = document.getElementById('end-date');
+
+        let currentStep = 1;
+        let uploadedFiles = [];
+
+        const treePlantationTemplate = `
+            <div class="form-grid">
+                <div class="form-group"><label for="land-area">Land Area (Hectares)</label><input type="number" id="land-area" name="landArea" required></div>
+                <div class="form-group"><label for="num-trees">Number of Trees</label><input type="number" id="num-trees" name="numTrees" required></div>
+                <div class="form-group full-width"><label for="tree-species">Tree Species</label><select id="tree-species" name="treeSpecies" multiple required><option>Oak</option><option>Pine</option><option>Maple</option><option>Spruce</option></select></div>
+                <div class="form-group"><label for="plantation-method">Plantation Method</label><input type="text" id="plantation-method" name="plantationMethod" required></div>
+                <div class="form-group"><label for="survival-rate">Expected Survival Rate (%)</label><input type="number" id="survival-rate" name="survivalRate" min="0" max="100" required></div>
+                <div class="form-group full-width"><label for="baseline-land-use">Baseline Land Use</label><input type="text" id="baseline-land-use" name="baselineLandUse" required></div>
+            </div>`;
+
+        const solarEnergyTemplate = `
+            <div class="form-grid">
+                <div class="form-group"><label for="capacity">Installed Capacity (kW)</label><input type="number" id="capacity" name="installedCapacity" required></div>
+                <div class="form-group"><label for="system-type">System Type</label><select id="system-type" name="systemType"><option value="on-grid">On-grid</option><option value="off-grid">Off-grid</option></select></div>
+                <div class="form-group"><label for="annual-gen">Annual Energy Generation (kWh)</label><input type="number" id="annual-gen" name="annualGeneration" required></div>
+                <div class="form-group"><label for="grid-factor">Grid Emission Factor</label><input type="text" id="grid-factor" name="gridEmissionFactor" required></div>
+                <div class="form-group full-width"><label for="baseline-energy">Baseline Energy Source</label><input type="text" id="baseline-energy" name="baselineEnergySource" required></div>
+            </div>`;
+
+        const updateStepper = (step) => {
+            stepperSteps.forEach((s, index) => {
+                const stepNumber = index + 1;
+                s.classList.remove('active', 'completed');
+                if (stepNumber < step) s.classList.add('completed');
+                else if (stepNumber === step) s.classList.add('active');
+            });
+        };
+
+        const showStep = (step) => {
+            formSteps.forEach(s => s.classList.toggle('active', parseInt(s.dataset.step) === step));
+            currentStep = step;
+            updateStepper(currentStep);
+        };
+
+        const validateStep = (step) => {
+            let isValid = true;
+            const inputs = formSteps[step - 1].querySelectorAll('[required]');
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.style.borderColor = 'red';
+                } else {
+                    input.style.borderColor = '';
+                }
+            });
+            return isValid;
+        };
+
+        nextButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (validateStep(currentStep)) {
+                    const nextStep = parseInt(button.dataset.next);
+                    if(nextStep === 5) generateReviewSummary();
+                    showStep(nextStep);
+                } else {
+                    alert('Please fill out all required fields.');
+                }
+            });
+        });
+
+        prevButtons.forEach(button => {
+            button.addEventListener('click', () => showStep(parseInt(button.dataset.prev)));
+        });
+
+        const updateTechnicalDetails = () => {
+            const selectedType = document.querySelector('input[name="projectType"]:checked').value;
+            technicalDetailsContainer.innerHTML = selectedType === 'tree' ? treePlantationTemplate : solarEnergyTemplate;
+        };
+
+        projectTypeRadios.forEach(radio => radio.addEventListener('change', updateTechnicalDetails));
+
+        const handleFiles = (files) => {
+            [...files].forEach(file => {
+                if(!uploadedFiles.find(f => f.name === file.name)) {
+                    uploadedFiles.push(file);
+                }
+            });
+            renderFilePreview();
+        };
+
+        const renderFilePreview = () => {
+            filePreviewContainer.innerHTML = '';
+            uploadedFiles.forEach((file, index) => {
+                const fileElement = document.createElement('div');
+                fileElement.className = 'file-preview-item';
+                fileElement.innerHTML = `<span>${file.name}</span><button type="button" class="remove-file-btn" data-index="${index}">&times;</button>`;
+                filePreviewContainer.appendChild(fileElement);
+            });
+        };
+
+        uploadArea.addEventListener('click', () => fileUploadInput.click());
+        uploadArea.addEventListener('dragover', (e) => e.preventDefault());
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            handleFiles(e.dataTransfer.files);
+        });
+        fileUploadInput.addEventListener('change', () => handleFiles(fileUploadInput.files));
+        filePreviewContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-file-btn')) {
+                uploadedFiles.splice(parseInt(e.target.dataset.index), 1);
+                renderFilePreview();
+            }
+        });
+
+        const generateReviewSummary = () => {
+            const formData = new FormData(form);
+            let summaryHTML = '<h3>Project Details</h3>';
+            for (let [key, value] of formData.entries()) {
+                if(value && key !== 'declaration') summaryHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+            }
+            summaryHTML += '<h3>Uploaded Documents</h3>';
+            if (uploadedFiles.length > 0) {
+                summaryHTML += '<ul>';
+                uploadedFiles.forEach(f => summaryHTML += `<li>${f.name}</li>`);
+                summaryHTML += '</ul>';
+            } else {
+                summaryHTML += '<p>No documents uploaded.</p>';
+            }
+            reviewSummaryContainer.innerHTML = summaryHTML;
+        };
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (validateStep(5) && document.getElementById('declaration').checked) {
+                form.style.display = 'none';
+                confirmationScreen.style.display = 'block';
+            } else {
+                alert('Please accept the declaration before submitting.');
+            }
+        });
+
+        ongoingCheckbox.addEventListener('change', () => {
+            endDateInput.disabled = ongoingCheckbox.checked;
+            if (ongoingCheckbox.checked) {
+                endDateInput.value = '';
+            }
+        });
+
+        // Initial setup
+        showStep(1);
+        updateTechnicalDetails();
+    });
+    </script>
+</body>
+</html>
